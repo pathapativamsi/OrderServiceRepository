@@ -5,10 +5,7 @@ import com.dailycodebuffer.OrderService.exception.CustomException;
 import com.dailycodebuffer.OrderService.external.client.PaymentService;
 import com.dailycodebuffer.OrderService.external.client.ProductService;
 import com.dailycodebuffer.OrderService.external.response.ProductErrorResponse;
-import com.dailycodebuffer.OrderService.model.OrderRequest;
-import com.dailycodebuffer.OrderService.model.OrderResponse;
-import com.dailycodebuffer.OrderService.model.PaymentRequest;
-import com.dailycodebuffer.OrderService.model.ProductResponse;
+import com.dailycodebuffer.OrderService.model.*;
 import com.dailycodebuffer.OrderService.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,12 +91,18 @@ public class OrdersServiceImpl implements OrdersService{
                 .quantity(productResponse.getQuantity())
                 .build();
 
+
+        log.info("getting payment details for id:{}",order.getId());
+
+        PaymentResponse paymentResponse = restTemplate.getForObject("http://PAYMENT-SERVICE/payments/"+order.getId(), PaymentResponse.class);
+
         return OrderResponse.builder()
                 .amount(order.getAmount())
                 .orderDate(order.getOrderDate())
                 .orderId(order.getId())
                 .orderStatus(order.getOrderStatus())
                 .productDetails(productDetails)
+                .paymentResponse(paymentResponse)
                 .build();
     }
 }
